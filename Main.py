@@ -16,8 +16,9 @@ from Diffusion import GaussianDiffusionSampler, GaussianDiffusionTrainer
 from Model import UNet
 from Scheduler import GradualWarmupScheduler
 
-device = torch.device('cuda:0')
+
 def train(modelConfig: Dict):
+    device = torch.device(modelConfig["device"])
     # dataset
     dataset = CIFAR10(
         root='./CIFAR10', train=True, download=True,
@@ -31,9 +32,11 @@ def train(modelConfig: Dict):
     # model setup
     net_model = UNet(T=modelConfig["T"], ch=modelConfig["ch"], ch_mult=modelConfig["ch_mult"], attn=modelConfig["attn"],
         num_res_blocks=modelConfig["num_res_blocks"], dropout=modelConfig["dropout"]).to(device)
+    if modelConfig["load_weight"] is not None:
+        net_model.load_state_dict(torch.load(os.path.join(modelConfig["save_dir"] ,modelConfig["load_weight"]), map_location=device))
     optimizer = torch.optim.AdamW(net_model.parameters(), lr=modelConfig["lr"], weight_decay=1e-4)
     cosineScheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=modelConfig["epoch"], eta_min=0, last_epoch=-1)
-    warmUpScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=5., warm_epoch=modelConfig["epoch"] // 10, after_scheduler=cosineScheduler)
+    warmUpScheduler = GradualWarmupScheduler(optimizer=optimizer, multiplier=modelConfig["multiplier"], warm_epoch=modelConfig["epoch"] // 10, after_scheduler=cosineScheduler)
     trainer = GaussianDiffusionTrainer(net_model, modelConfig["beta_1"], modelConfig["beta_T"], modelConfig["T"]).to(device)
 
     # start training
@@ -60,10 +63,10 @@ def train(modelConfig: Dict):
 def eval(modelConfig: Dict, checkpoint_name: str, sampled_img_name: str):
     # load model and evaluate
     with torch.no_grad():
-        device = torch.device('cuda:0')
+        device = torch.device(modelConfig["device"])
         model = UNet(T=modelConfig["T"], ch=modelConfig["ch"], ch_mult=modelConfig["ch_mult"], attn=modelConfig["attn"],
         num_res_blocks=modelConfig["num_res_blocks"], dropout=0.)
-        ckpt = torch.load(os.path.join(modelConfig["save_dir"], checkpoint_name))
+        ckpt = torch.load(os.path.join(modelConfig["save_dir"], checkpoint_name), map_location=device)
         model.load_state_dict(ckpt)
         print("model load weight done.")
         model.eval()
@@ -71,7 +74,7 @@ def eval(modelConfig: Dict, checkpoint_name: str, sampled_img_name: str):
         #### Sampled from standard normal distribution
         noisyImage = torch.randn(size=[modelConfig["batch_size"], 3, 32, 32], device=device)
         saveNoisy = torch.clamp(noisyImage * 0.5 + 0.5, 0, 1)
-        save_image(saveNoisy, os.path.join(modelConfig["sampled_dir"],  "noisy.png"), nrow=8)
+        save_image(saveNoisy, os.path.join(modelConfig["sampled_dir"],  "noisy_noCond.png"), nrow=8)
         sampledImgs = sampler(noisyImage)
         sampledImgs = sampledImgs * 0.5 + 0.5 # [0 ~ 1]
         save_image(sampledImgs,os.path.join(modelConfig["sampled_dir"],  sampled_img_name), nrow=8)
@@ -80,20 +83,23 @@ def eval(modelConfig: Dict, checkpoint_name: str, sampled_img_name: str):
 def main(state, checkpoint_name: str, sampled_img_name: str):
     model_config = {
         "epoch": 200,
-        "batch_size": 64,
+        "batch_size": 80,
         "T": 1000,
         "ch": 128,
         "ch_mult": [1, 2, 3, 4],
         "attn": [2],
         "num_res_blocks": 2,
         "dropout": 0.15,
-        "lr": 2e-4,
+        "lr": 1e-4,
+        "multiplier": 2.,
         "beta_1": 1e-4,
         "beta_T": 0.02,
         "img_size": 32,
         "grad_clip": 1.,
         "save_dir": "./Checkpoints/",
-        "sampled_dir": "./SampledImgs/"
+        "load_weight": None,
+        "sampled_dir": "./SampledImgs/",
+        "device": "cuda:1"
     }
     if state == "train":
         train(model_config)
@@ -101,4 +107,4 @@ def main(state, checkpoint_name: str, sampled_img_name: str):
         eval(model_config, checkpoint_name, sampled_img_name)
         
 if __name__ == '__main__':
-    main("train", "ckpt_104_.pt", "104_sampled_64.png")
+    main("eval", "ckpt_199_.pt", "sampled_80_noCond.png")
