@@ -7,5 +7,4 @@ This may be the simplest implement of DDPM. <br>
 Some generated images are showed below:
 
 ![Generated Images without condition](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-/blob/main/SampledImgs/sampled_80_noCond.png)
-
 ![Generated Images with condition](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-/blob/main/SampledImgs/sampled_80_63.png)
