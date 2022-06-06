@@ -8,7 +8,7 @@ Some generated images are showed below:
 
 * 1. DDPM without guidence:
 
-<center>
+<center class = "half">
   <img src = "https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-/blob/main/SampledImgs/sampled_80_noCond.png">
 </center>
 
