@@ -8,7 +8,7 @@ Some generated images are showed below:
 
 * 1. DDPM without guidence:
 
-![Generated Images without condition](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-/blob/main/SampledImgs/sampled_80_noCond.png#pic_center)
+<center>![Generated Images without condition](https://github.com/zoubohao/DenoisingDiffusionProbabilityModel-ddpm-/blob/main/SampledImgs/sampled_80_noCond.png)</center>
 
 * 2. DDPM + Classifier free guidence:
 
