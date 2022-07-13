@@ -3,7 +3,7 @@ from DiffusionFreeGuidence.TrainCondition import train, eval
 
 def main(model_config=None):
     modelConfig = {
-        "state": "eval", # or eval
+        "state": "train", # or eval
         "epoch": 70,
         "batch_size": 80,
         "T": 500,
