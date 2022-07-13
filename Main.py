@@ -3,7 +3,7 @@ from Diffusion.Train import train, eval
 
 def main(model_config = None):
     modelConfig = {
-        "state": "eval", # or eval
+        "state": "train", # or eval
         "epoch": 200,
         "batch_size": 80,
         "T": 1000,
