@@ -1,5 +1,5 @@
 # DenoisingDiffusionProbabilityModel
-This may be the simplest implement of DDPM. I trained with CIFAR-10 dataset.<br>
+This may be the simplest implement of DDPM. I trained with CIFAR-10 dataset. The link of pretrain weights, which trained on CIFAR-10 are in the Issue 2. <br>
 <br>
 **HOW TO RUN**
 * 1.  You can run Main.py to train the UNet on CIFAR-10 dataset. After training, you can set the parameters in the model config to see the amazing process of DDPM.
