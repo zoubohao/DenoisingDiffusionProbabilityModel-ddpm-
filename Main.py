@@ -18,7 +18,7 @@ def main(model_config = None):
         "beta_T": 0.02,
         "img_size": 32,
         "grad_clip": 1.,
-        "device": "cuda:1",
+        "device": "cuda:0", ### MAKE SURE YOU HAVE A GPU !!!
         "training_load_weight": None,
         "save_weight_dir": "./Checkpoints/",
         "test_load_weight": "ckpt_199_.pt",
